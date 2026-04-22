@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Life OS
 
-## Getting Started
+Sistema personal de gestión de vida para Izaak. Árbol jerárquico + dashboard + to-dos + notas + docs + pipeline.
 
-First, run the development server:
+## Stack
+- Next.js 14 (App Router) + TypeScript
+- Tailwind CSS (dark + teal #06D6A0 + glassmorphism)
+- React Flow (árbol interactivo)
+- Supabase (Postgres + Storage)
+- Render (hosting)
+- PWA (mobile)
+
+## Setup local
 
 ```bash
+npm install
+cp .env.example .env.local
+# Rellenar NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Setup Supabase
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. Crear un proyecto nuevo en https://supabase.com/dashboard
+2. Copiar Project URL + anon key → `.env.local`
+3. SQL Editor → pegar `supabase/schema.sql` → Run
+4. Storage → New bucket → nombre `documents` → Private
+5. Storage → documents → Policies → crear policies para `anon` y `authenticated`:
+   - SELECT, INSERT, UPDATE, DELETE todos `true` (single-user app)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Deploy a Render
 
-## Learn More
+1. Push este repo a GitHub
+2. Render → New Web Service → conectar repo
+3. Render detecta `render.yaml` automáticamente
+4. Agregar env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+5. Deploy
 
-To learn more about Next.js, take a look at the following resources:
+## PWA
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Al abrir la URL en móvil, Safari/Chrome permite "Add to Home Screen" — se instala como app nativa con ícono.

@@ -3,25 +3,64 @@
 @tailwind utilities;
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --bg: #0a0f1e;
+  --bg-2: #0d1428;
+  --teal: #06D6A0;
+  --glass: rgba(255, 255, 255, 0.04);
+  --glass-border: rgba(255, 255, 255, 0.08);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html, body {
+  background: radial-gradient(1200px 800px at 20% 0%, #0f1a38 0%, var(--bg) 50%), var(--bg);
+  color: #e7edf9;
+  min-height: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
 body {
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'DM Sans', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  font-feature-settings: 'ss01', 'cv11';
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+/* Scrollbar */
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.08); border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.15); }
+
+@layer components {
+  .glass {
+    @apply bg-white/[0.04] backdrop-blur-xl border border-white/10;
+  }
+  .glass-strong {
+    @apply bg-white/[0.06] backdrop-blur-2xl border border-white/10;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all;
+  }
+  .btn-primary {
+    @apply btn bg-teal-400/90 text-slate-900 hover:bg-teal-300 shadow-[0_0_24px_-4px_rgba(6,214,160,0.6)];
+  }
+  .btn-ghost {
+    @apply btn bg-white/5 text-white/80 hover:bg-white/10 border border-white/10;
+  }
+  .input {
+    @apply w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-sm text-white placeholder-white/30 outline-none focus:border-teal-400/60 focus:bg-white/[0.07] transition-colors;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium uppercase tracking-wide;
   }
 }
+
+/* React Flow overrides */
+.react-flow__edge-path { stroke: rgba(6,214,160,0.45); stroke-width: 1.6; }
+.react-flow__edge.selected .react-flow__edge-path { stroke: #06D6A0; }
+.react-flow__handle { opacity: 0; }
+.react-flow__background-dots { opacity: 0.35; }
+.react-flow__controls { background: rgba(255,255,255,0.04) !important; border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 12px !important; overflow: hidden; }
+.react-flow__controls-button { background: transparent !important; border-bottom: 1px solid rgba(255,255,255,0.06) !important; color: #e7edf9 !important; fill: #e7edf9 !important; }
+.react-flow__controls-button:hover { background: rgba(255,255,255,0.08) !important; }
+
+/* Safe area for mobile */
+.safe-bottom { padding-bottom: env(safe-area-inset-bottom); }
+.safe-top { padding-top: env(safe-area-inset-top); }
