@@ -147,6 +147,7 @@ export default function TreeCanvas() {
             fetchAll();
           }}
           onTodoChange={fetchAll}
+          onUpdated={(u) => setRawNodes((prev) => prev.map((n) => (n.id === u.id ? u : n)))}
         />
       )}
     </div>

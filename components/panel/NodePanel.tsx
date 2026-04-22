@@ -1,11 +1,12 @@
 'use client';
 import { useEffect, useState } from 'react';
-import { X, CheckSquare, FileText, Paperclip, KanbanSquare, Trash2, ChevronRight } from 'lucide-react';
+import { X, CheckSquare, FileText, Paperclip, KanbanSquare, Trash2, ChevronRight, Pencil } from 'lucide-react';
 import type { TreeNode } from '@/lib/types';
 import TodosTab from './TodosTab';
 import NotesTab from './NotesTab';
 import DocsTab from './DocsTab';
 import PipelineTab from './PipelineTab';
+import EditNodeModal from '@/components/tree/EditNodeModal';
 
 type Tab = 'todos' | 'notes' | 'docs' | 'pipeline';
 
@@ -15,6 +16,7 @@ type Props = {
   onClose: () => void;
   onDeleted: (id: string) => void;
   onTodoChange: () => void;
+  onUpdated?: (n: TreeNode) => void;
 };
 
 function breadcrumb(node: TreeNode, all: TreeNode[]): TreeNode[] {
@@ -27,9 +29,20 @@ function breadcrumb(node: TreeNode, all: TreeNode[]): TreeNode[] {
   return path;
 }
 
-export default function NodePanel({ node, allNodes, onClose, onDeleted, onTodoChange }: Props) {
+export default function NodePanel({ node, allNodes, onClose, onDeleted, onTodoChange, onUpdated }: Props) {
   const [tab, setTab] = useState<Tab>('todos');
+  const [editing, setEditing] = useState(false);
   const crumbs = breadcrumb(node, allNodes);
+
+  async function handleEdit(data: { name: string; icon: string; color: string }) {
+    const res = await fetch('/api/nodes', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: node.id, ...data }),
+    });
+    const updated: TreeNode = await res.json();
+    onUpdated?.(updated);
+  }
 
   useEffect(() => {
     const saved = localStorage.getItem(`tab-${node.id}`);
@@ -60,12 +73,14 @@ export default function NodePanel({ node, allNodes, onClose, onDeleted, onTodoCh
         <div className="p-5 pt-20 sm:pt-5 border-b border-white/10">
           <div className="flex items-start justify-between gap-2 mb-3">
             <div className="flex items-center gap-3 min-w-0">
-              <div
-                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0"
+              <button
+                onClick={() => setEditing(true)}
+                className="w-11 h-11 rounded-xl flex items-center justify-center text-xl shrink-0 hover:ring-2 hover:ring-teal-400/60 transition"
                 style={{ background: `${node.color}22`, border: `1px solid ${node.color}55` }}
+                title="Editar icono"
               >
                 {node.icon}
-              </div>
+              </button>
               <div className="min-w-0">
                 <h2 className="text-lg font-bold truncate">{node.name}</h2>
                 <div className="flex items-center gap-0.5 text-xs text-white/40 truncate">
@@ -79,6 +94,9 @@ export default function NodePanel({ node, allNodes, onClose, onDeleted, onTodoCh
               </div>
             </div>
             <div className="flex gap-1 shrink-0">
+              <button onClick={() => setEditing(true)} className="p-2 rounded-lg text-white/50 hover:text-teal-400 hover:bg-teal-400/10" title="Editar">
+                <Pencil size={18} />
+              </button>
               {node.parent_id && (
                 <button onClick={handleDelete} className="p-2 rounded-lg text-white/50 hover:text-red-400 hover:bg-red-500/10">
                   <Trash2 size={18} />
@@ -113,6 +131,7 @@ export default function NodePanel({ node, allNodes, onClose, onDeleted, onTodoCh
           {tab === 'pipeline' && <PipelineTab nodeId={node.id} />}
         </div>
       </aside>
+      {editing && <EditNodeModal node={node} onClose={() => setEditing(false)} onSave={handleEdit} />}
     </>
   );
 }
